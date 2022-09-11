@@ -17,7 +17,7 @@ print("filelist " +str(filelist))
 for name in filelist:
     #name = "/mnt/work/nooroka/alignments300/Proteobacteria-60-balanced/RAxML/PB_PF12327_1.fasta.fasta"
     #record_dict = {}
-    #name = "PB_PF18073_1.fasta.fasta"
+#name = "PB_PF18073_1.fasta.fasta"
     print(name)
     record_dict = defaultdict(list)
     handle = open(name)
@@ -31,14 +31,13 @@ for name in filelist:
     print("record_dict "+str(record_dict))
     print("reckeys "+str(len(record_dict.keys())))
     name2 = name.split("/")
-
-    os.chdir("/mnt/work/nooroka/one-hotnew2")
-    if (not os.path.exists("/mnt/work/nooroka/one-hotnew2/{}/{}".format(name2[5],name2[6]))) and (not os.path.exists("/mnt/work/nooroka/one-hotnew2/{}".format(name2[5]))):
-          os.mkdir("/mnt/work/nooroka/one-hotnew2/{}".format(name2[5]))
-          os.mkdir("/mnt/work/nooroka/one-hotnew2/{}/{}".format(name2[5],name2[6]))
-    elif (not os.path.exists("/mnt/work/nooroka/one-hotnew2/{}/{}".format(name2[5],name2[6]))) and  (os.path.exists("/mnt/work/nooroka/one-hotnew2/{}".format(name2[5]))):
-          os.mkdir("/mnt/work/nooroka/one-hotnew2/{}/{}".format(name2[5],name2[6]))
-    os.chdir("/mnt/work/nooroka/one-hotnew2/{}/{}".format(name2[5],name2[6]))
+    os.chdir("/mnt/work/nooroka/one-hotnew2npy")
+    if (not os.path.exists("/mnt/work/nooroka/one-hotnew2npy/{}/{}".format(name2[5],name2[6]))) and (not os.path.exists("/mnt/work/nooroka/one-hotnew2npy/{}".format(name2[5]))):
+          os.mkdir("/mnt/work/nooroka/one-hotnew2npy/{}".format(name2[5]))
+          os.mkdir("/mnt/work/nooroka/one-hotnew2npy/{}/{}".format(name2[5],name2[6]))
+    elif (not os.path.exists("/mnt/work/nooroka/one-hotnew2npy/{}/{}".format(name2[5],name2[6]))) and  (os.path.exists("/mnt/work/nooroka/one-hotnew2npy/{}".format(name2[5]))):
+          os.mkdir("/mnt/work/nooroka/one-hotnew2npy/{}/{}".format(name2[5],name2[6]))
+    os.chdir("/mnt/work/nooroka/one-hotnew2npy/{}/{}".format(name2[5],name2[6]))
     
     # Join all the sentences together and extract the unique characters
     # from the combined sentences
@@ -47,8 +46,8 @@ for name in filelist:
     # Creating a dictionary that maps integers to the characters
     char2int = {'-':0, 'A':1,'C':2,'D':3,'E':4,'F':5, 'G':6, 'H':7, 'I':8,'K':9,'L':10,'M':11, 'N':12, 'P':13, 'Q':14, 'R':15,'S':16, 'T':17, 'V':18, 'W':19, 'Y':20,'X':21}  
     #for key in record_dict:
-     #    for i in range(len(record_dict[key])):
-     #       text.append((key,record_dict[key][i]))
+    #    for i in range(len(record_dict[key])):
+    #       text.append((key,record_dict[key][i]))
     maxlen = 301
     # Creating lists that will hold our input and target sequences
     input_seq = []
@@ -80,10 +79,37 @@ for name in filelist:
     for j in range(len(text2)):
         text3.append((text2[j][0],input_seq2[j]))
     print("text3 "+str(text3))
-    d = 0
-    w = open("/mnt/work/nooroka/one-hotnew2/{}/{}/{}.txt".format(name2[5],name2[6],name2[-1]),"w")
-    #w= open("test6.txt","w")
-    for h in range(len(text3)):
+    def func_chunk(lst, n):
+        for x in range(0, len(lst), n):
+            e_c = lst[x : n + x]
+
+            if len(e_c) < n:
+                e_c = e_c + [None for y in range(n - len(e_c))]
+            yield e_c
+    list3 = list(func_chunk(text3,4))
+    list4 = []
+    list4n = []
+
+    kl = 0
+    list5 = []
+    strn =''
+    for e in range(len(text3)):
+        list5.append(text3[e][1])
+        strn+=str(text3[e][0])+"_"
+        kl+=1
+        if kl%4 == 0:
+            arr = np.array(list5)
+            print("arr "+str(arr))
+            print(arr.shape)
+            print(arr.dtype)
+            np.save("/mnt/work/nooroka/one-hotnew2npy/{}/{}/{}_{}.npy".format(name2[5],name2[6],name2[-1],strn),arr)
+            list5  = []
+            strn = ""
+         
+'''
+d = 0
+w= open("test6.txt","w")
+for h in range(len(text3)):
         d+=1
         w.write(">"+str(text3[h][0])+"\n")
         for xs in text3[h][1]:
@@ -94,5 +120,5 @@ for name in filelist:
             w.write("\n")
             w.write("\n")
             w.write("\n")
-    w.close()
-
+w.close()
+'''
